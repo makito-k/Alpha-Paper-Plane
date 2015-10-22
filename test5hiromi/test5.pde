@@ -1,21 +1,23 @@
 import gifAnimation.*;
 import ddf.minim.*;
 
+int once = 0;
 int scene;
 int mode = 0;
 int count = 0;
 int alt = 75;
 int x=600;
+int scrollCount=0;
 float random;
 float score = 0;
 boolean Nod;
 boolean Shake;
 boolean Alpha;
 
-PImage up,down,normal,sky;
+PImage up,down,normal,sky, bgNormal, bgHorror, bgEro, virus;
 Gif airplain,horror1,horror2,ero1;
 Minim minim;
-AudioPlayer title_bgm,decision,cursor,mode0_bgm,mode1_bgm,mode2_bgm;
+AudioPlayer title_bgm,decision,cursor,mode0_bgm, mode0_gameover_bgm, mode1_bgm,mode2_bgm, error_bgm, hereWeGo;
 
 void setup(){
   size(1000, 600);
@@ -23,17 +25,23 @@ void setup(){
   background(255);
   smooth();
   minim = new Minim(this);  
-  title_bgm = minim.loadFile("/music/Final Fantasy XIII Main Menu Theme.mp3");
-  decision = minim.loadFile("/music/decision.mp3");
-  cursor = minim.loadFile("/music/cursor.mp3");
-  mode0_bgm = minim.loadFile("/music/mario.mp3");
-  mode1_bgm = minim.loadFile("/music/radionoise.mp3");
-  mode2_bgm = minim.loadFile("/music/H na BGM.mp3");
-  up = loadImage("/img/airplain_up.png");
-  down = loadImage("/img/airplain_down.png");
-  normal = loadImage("/img/airplain_normal.png");
-  sky = loadImage("/img/sky.jpg");
-  airplain = new Gif(this, "/img/title.gif");
+  title_bgm = minim.loadFile("music/Final Fantasy XIII Main Menu Theme.mp3");
+  decision = minim.loadFile("music/decision.mp3");
+  cursor = minim.loadFile("music/cursor.mp3");
+  mode0_bgm = minim.loadFile("music/mario.mp3");
+  mode0_gameover_bgm = minim.loadFile("music/marioDeath.mp3");
+  mode1_bgm = minim.loadFile("music/radionoise.mp3");
+  mode2_bgm = minim.loadFile("music/H na BGM.mp3");
+  error_bgm = minim.loadFile("music/Windows20XP20Error.wav");
+  hereWeGo = minim.loadFile("music/mario-herewego.WAV");
+  up = loadImage("img/airplain_up.png");
+  down = loadImage("img/airplain_down.png");
+  normal = loadImage("img/airplain_normal.png");
+  sky = loadImage("img/sky.jpg");
+  bgNormal = loadImage("img/mario(840*600).gif");
+  bgEro = loadImage("img/black.JPG");
+  virus = loadImage("img/virusWindow.jpg");
+  airplain = new Gif(this, "img/title.gif");
   airplain.play(); 
   horror1 = new Gif(this,"img/horror1.gif");
   horror2 = new Gif(this,"img/horror2.gif");
@@ -162,12 +170,22 @@ void draw(){
     
     //----------playing----------
     
-    background(255);
+    //background(255);
     stroke(0);
     score++;
     textSize(30);
-    if(mode==0){
+    
+    if(mode==0){//normal mode
+      if(once == 0){
+        hereWeGo.play();
+        once++;
+      }  
       mode0_bgm.play();
+      image(bgNormal, scrollCount, 0);
+      image(bgNormal, 840+scrollCount, 0);
+      image(bgNormal, 1680+scrollCount, 0);
+      scrollCount--;
+
     }else if(mode==1){
       mode1_bgm.play();
       background(0);
@@ -182,29 +200,65 @@ void draw(){
       }
     }else{
       mode2_bgm.play();
-      background(255,230,240);
+      image(bgEro, scrollCount, 0);
+      image(bgEro, 978+scrollCount, 0);
+      image(bgEro, 978+scrollCount, 0);
+      scrollCount--;
       fill(139,28,98);
       stroke(139,28,98);
       if(score>500 && score<635){
         ero1.play();
         image(ero1,0,0,width,height);
       }
+      if(score>700 && score<790){
+        mode2_bgm.pause();
+        mode2_bgm.rewind();
+        error_bgm.play();
+        image(virus, 340,180);
+        if(score>720 && score<790){
+          error_bgm.play();
+          image(virus, 0,0);
+        }
+        if(score>740 && score<790){
+          error_bgm.play();
+          image(virus,500,350);
+        }
+        if(score>760 && score<790){
+          error_bgm.play();
+          image(virus, 100,400);
+        }
+        if(score>770 && score<790){
+          error_bgm.play();
+          image(virus, 700,120);
+        }
+        
+      }
+      if(score>790){
+        error_bgm.pause();
+        error_bgm.rewind();
+        mode2_bgm.play();  
+      }
     }
-    line(0,height-100,width,height-100);
+    line(0,height-29,width,height-29);//GameOver line
     if(Alpha == true){
       Alpha = false;
       if(alt == 75){
-        image(normal,200,alt*2-50,100,46.5);
+        image(normal,200,alt*2-50,100,46.5);//(200,alt*2-50)から画像
       }
       if(alt > 75){
         alt--;
         image(up,200,alt*2-50,100,55.1);
       }
     }else{
-      alt++;
+      //alt++;
       image(down,200,alt*2-50,100,57);
     }
-    if(alt > 246){
+    if(alt > 282){//死ぬ高さ
+      if (mode == 0){
+        mode0_bgm.pause();
+        mode0_bgm.rewind();
+        mode0_gameover_bgm.play();
+      }
       scene = 4;
       alt = 75;
     }else if(score>3000){
@@ -218,6 +272,7 @@ void draw(){
     
     textSize(60);
     text("Game Over", width/2, height/2);
+    
     count--;
     if(count < 0){
       scene = 0;
