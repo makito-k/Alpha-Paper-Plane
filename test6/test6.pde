@@ -19,6 +19,7 @@ int count = 0;
 int alt = 75;
 int x=600;
 int scrollCount=0;
+int scrollCount2=0;
 float random;
 float score = 0;
 boolean Nod;
@@ -74,35 +75,35 @@ void setup(){
 }
 
 void draw(){
-  
+        
    if(draw_count <= 10){
    draw_count += 1;
-  }
+   }
   
-    if(draw_count > 10){
-      for(int ch = 0; ch< N_ACC_CHANNELS; ch++){
-        if(ch == 0){
-          float a = 0;
-          for(int t = 205; t < 210; t++){
-            a += acc_buffer[ch][(acc_pointer + t) % BUFFER_SIZE];
-          }
-          a /= 5.0;
-          if(acc_buffer[ch][(acc_pointer+219)%BUFFER_SIZE] - a > 500){
-            Nod = true;
-            draw_count = 0;  //yama ga torisugiru nowo 3byou matsu
-          }
-        }else if(ch == 2){
-          float b = 0;
-          for(int t = 205; t < 210; t++){
-            b += acc_buffer[ch][(acc_pointer + t) % BUFFER_SIZE];
-          }
-          b /= 5.0;
-          if(acc_buffer[ch][(acc_pointer+219)%BUFFER_SIZE] - b > 350){
-            Shake = true;
-            draw_count = 0;
-          }
+   if(draw_count > 10){
+    for(int ch = 0; ch< N_ACC_CHANNELS; ch++){
+      if(ch == 0){
+        float a = 0;
+        for(int t = 205; t < 210; t++){
+          a += acc_buffer[ch][(acc_pointer + t) % BUFFER_SIZE];
+        }
+        a /= 5.0;
+        if(acc_buffer[ch][(acc_pointer+219)%BUFFER_SIZE] - a > 500){
+          Nod = true;
+          draw_count = 0;  //yama ga torisugiru nowo 3byou matsu
+        }
+      }else if(ch == 2){
+        float b = 0;
+        for(int t = 205; t < 210; t++){
+          b += acc_buffer[ch][(acc_pointer + t) % BUFFER_SIZE];
+        }
+        b /= 5.0;
+        if(acc_buffer[ch][(acc_pointer+219)%BUFFER_SIZE] - b > 350){
+          Shake = true;
+          draw_count = 0;
         }
       }
+    }
   }
 
   if(scene == 0){
@@ -239,9 +240,10 @@ void draw(){
         hereWeGo.play();
       }  
       mode0_bgm.play();
-      image(bgNormal, scrollCount, 0);
-      image(bgNormal, 840+scrollCount, 0);
-      image(bgNormal, 1680+scrollCount, 0);
+      scrollCount2 = scrollCount%840;
+      image(bgNormal, scrollCount2, 0);
+      image(bgNormal, 840+scrollCount2, 0);
+      image(bgNormal, 1680+scrollCount2, 0);
       scrollCount--;
 
     }else if(mode==1){
@@ -289,9 +291,10 @@ void draw(){
       }
     }else{
       mode2_bgm.play();
-      image(bgEro, scrollCount, 0);
-      image(bgEro, 978+scrollCount, 0);
-      image(bgEro, 1956+scrollCount, 0);
+      scrollCount2 = scrollCount%978;
+      image(bgEro, scrollCount2, 0);
+      image(bgEro, 978+scrollCount2, 0);
+      image(bgEro, 1956+scrollCount2, 0);
       scrollCount--;
       text(scrollCount, 100, 100);
       fill(139,28,98);
@@ -300,33 +303,57 @@ void draw(){
         ero1.play();
         image(ero1,0,0,width,height);
       }
-            if(score>700 && score<790){
+      if(score>700 && score<790){
         mode2_bgm.pause();
         mode2_bgm.rewind();
         error_bgm.play();
-        image(virus, 340,180);
-        if(score>720 && score<790){
-          error_bgm.play();
-          image(virus, 0,0);
-        }
-        if(score>740 && score<790){
-          error_bgm.play();
-          image(virus,500,350);
-        }
-        if(score>760 && score<790){
-          error_bgm.play();
-          image(virus, 100,400);
-        }
-        if(score>770 && score<790){
-          error_bgm.play();
-          image(virus, 700,120);
-        }
-        
-      }
-      if(score>790){
         error_bgm.pause();
         error_bgm.rewind();
-        mode2_bgm.play();  
+        image(virus, 340,180);
+      if(score>=720 && score<790){
+        if(score=720){
+          error_bgm.play();
+          error_bgm.pause();
+          error_bgm.rewind();
+          image(virus, 0,0);
+        }
+        else{
+          image(virus, 0,0);  
+        }
+      if(score>=740 && score<790){
+        if(score=740){
+          error_bgm.play();
+          error_bgm.pause();
+          error_bgm.rewind();
+          image(virus, 500,350);
+        }
+        else{
+          image(virus, 500,350);  
+        }
+      if(score>=760 && score<790){
+        if(score=760){
+          error_bgm.play();
+          error_bgm.pause();
+          error_bgm.rewind();
+          image(virus, 100,400);
+        }
+        else{
+          image(virus, 100,400);  
+        }
+      if(score>=780 && score<790){
+        if(score=780){
+          error_bgm.play();
+          error_bgm.pause();
+          error_bgm.rewind();
+          image(virus, 700,120);
+        }
+        else{
+          image(virus, 700,120);  
+        }
+      if(score>790){
+          error_bgm.pause();
+          error_bgm.rewind();
+          mode2_bgm.play();  
       }
 
     }
@@ -389,6 +416,7 @@ void draw(){
       scene = 0;
       score = 0;
       count = 150;
+      scrollCount = 0;
       mode0_bgm.pause();
       mode0_bgm.rewind();
       mode1_bgm.pause();
@@ -399,7 +427,7 @@ void draw(){
   }
 }
 
-void keyPressed() {
+void keyPressed(){
   if(keyCode == DOWN){
     Nod = true;
   }else if(keyCode == RIGHT){
