@@ -31,16 +31,23 @@ int x=600;
 int scrollCount=0;
 int scrollCount2=0;
 float random;
-float score = 0;
+float score = 0.0;
 boolean Nod;
 boolean Shake;
 boolean Alpha;
 String modename;
 
 PImage up,down,normal,sky,horror6,horror7,bgNormal, bgHorror, bgEro, virus;
-Gif airplain,horror1,horror2,horror3,horror4,horror5,horror8,horror9,horror10,horror11,horror12,ero1;
+PImage[] eroimg = new PImage[100];
+Gif airplain,horror1,horror2,horror3,horror4,horror5,horror8,horror9,horror10,horror11,horror12,erogif0,erogif1,erogif2,erogif3,erogif4,erogif5,erogif6,erogif7,erogif8,erogif9;
 Minim minim;
-AudioPlayer title_bgm,decision,cursor,mode0_bgm,mode0_gameover_bgm, mode1_bgm,mode2_bgm, error_bgm, hereWeGo,nigasanai,tasukete,himei;
+AudioPlayer title_bgm,decision,cursor,mode0_bgm,mode0_gameover_bgm, mode1_bgm,mode2_bgm, error_bgm, hereWeGo,nigasanai,tasukete,himei,rocky;
+
+//エロのスライドショー用の変数
+int eroimgID = 0;
+int eroimgMaxID = 7;
+int fadeAlpha = 768;
+int fadeAlphaDefault = fadeAlpha;
 
 void setup(){
   size(1000, 600);
@@ -60,6 +67,7 @@ void setup(){
   nigasanai = minim.loadFile("music/nigasanai.mp3");
   tasukete = minim.loadFile("music/tasukete.mp3");
   himei = minim.loadFile("music/himei.mp3");
+  rocky = minim.loadFile("music/Theme of Rocky.mp3");
   up = loadImage("img/airplain_up.png");
   down = loadImage("img/airplain_down.png");
   normal = loadImage("img/airplain_normal.png");
@@ -81,7 +89,24 @@ void setup(){
   horror10 = new Gif(this,"img/horror10.gif");
   horror11 = new Gif(this,"img/horror11.gif");
   horror12 = new Gif(this,"img/horror12.gif");
-  ero1 = new Gif(this,"img/ero1.gif");
+  
+  int i = 0;
+  while(i<=21){
+    String imgName = "img/ero"+str(i+1)+".jpg";
+    eroimg[i] = loadImage(imgName);
+    i++;
+  }
+  erogif0 = new Gif(this,"img/erogif0.gif");
+  erogif1 = new Gif(this,"img/erogif1.gif");
+  erogif2 = new Gif(this,"img/erogif2.gif");
+  erogif3 = new Gif(this,"img/erogif3.gif");
+  erogif4 = new Gif(this,"img/erogif4.gif");
+  erogif5 = new Gif(this,"img/erogif5.gif");
+  erogif6 = new Gif(this,"img/erogif6.gif");
+  erogif7 = new Gif(this,"img/erogif7.gif");
+  erogif8 = new Gif(this,"img/erogif8.gif");
+  erogif9 = new Gif(this,"img/erogif9.gif");
+  
 }
 
 void draw(){
@@ -128,7 +153,7 @@ void draw(){
      for(int i = 0; i<100; i++){
        value_ave_long += value[(pointer+BUFFER_SIZE-100+i) % BUFFER_SIZE]/100;
      }
-     limit = value_ave_long * limit_ratio;   
+     limit = value_ave_long * limit_ratio;
    }
    if(value_ave > limit){
      Alpha = true;
@@ -173,7 +198,7 @@ void draw(){
       title_bgm.pause(); 
       title_bgm.rewind();
     }
-  }else if(scene == 1){  
+  }else if(scene == 1){
     
     //----------mode select----------
     
@@ -288,6 +313,9 @@ void draw(){
     stroke(0);
     textSize(30);
     if(mode==0){
+      
+      //----------Normal Mode----------
+      
       if(score == 0){
         hereWeGo.play();
       }  
@@ -299,6 +327,9 @@ void draw(){
       scrollCount--;
 
     }else if(mode==1){
+      
+      //----------Horror Mode----------
+      
       mode1_bgm.play();
       background(0);
       fill(255,48,48);
@@ -342,29 +373,133 @@ void draw(){
         image(horror12,0,0,width,height);
       }
     }else{
+      
+      //----------Ero Mode----------
+      
       scrollCount2 = scrollCount%978;
       image(bgEro, scrollCount2, 0);
       image(bgEro, 978+scrollCount2, 0);
       image(bgEro, 1956+scrollCount2, 0);
       scrollCount--;
-      fill(139,28,98);
-      stroke(139,28,98);
       if(score==0){
         mode2_bgm.play();
       }
-      if(score>500 && score<635){
-        ero1.play();
-        image(ero1,0,0,width,height);
+      imageMode(CENTER);
+      if(score >= 120 && score <= 1296){
+        //imageMode(CENTER);
+        if(eroimgID < eroimgMaxID){
+          if(fadeAlpha > 256){
+            fadeAlpha -= 5;
+            tint(255,fadeAlpha);
+            image(eroimg[eroimgID],width/2,height/2);
+          }else if(fadeAlpha <= 256 && fadeAlpha > 0){
+            fadeAlpha -= 4;
+            tint(255,255);
+            image(eroimg[eroimgID+1],width/2,height/2);
+            tint(255,fadeAlpha);
+            image(eroimg[eroimgID],width/2,height/2);
+          }else if(fadeAlpha <= 0){
+            image(eroimg[eroimgID+1],width/2,height/2);
+            fadeAlpha = fadeAlphaDefault;
+            eroimgID++;
+          }
+        }
+        //imageMode(CORNER);
+      }else if(score > 1295 && score <= 1396){
+        //imageMode(CENTER);
+        image(eroimg[eroimgID],width/2,height/2);
+        //imageMode(CORNER);
       }
-//score 700~290 : errorlog      
-//score 790~1000 : blackout
-      if(score>1000){
+      if(score>=1396 && score<1486){
+        if(score==1396){
+          mode2_bgm.pause();
+          error_bgm.pause();
+          error_bgm.rewind();
+          error_bgm.play();
+          image(virus, 340,180);
+        }else{
+          image(virus, 340,180);
+        }
+      } 
+      if(score>=1416 && score<1486){
+        if(score==1416){
+          error_bgm.pause();
+          error_bgm.rewind();
+          error_bgm.play();
+          image(virus, 0,0);
+        }else{
+          image(virus, 0,0);  
+        }
+      }
+      if(score>=1436 && score<1486){
+        if(score==1436){
+          error_bgm.pause();
+          error_bgm.rewind();
+          error_bgm.play();
+          image(virus, 500,350);
+        }else{
+          image(virus, 500,350);  
+        }
+      }
+      if(score>=1456 && score<1486){
+        if(score==1866){
+          error_bgm.pause();
+          error_bgm.rewind();
+          error_bgm.play();
+          image(virus, 100,400);
+        }else{
+          image(virus, 100,400);  
+        }
+      }
+      if(score>=1476 && score<1486){
+        if(score==1476){
+          error_bgm.pause();
+          error_bgm.rewind();
+          error_bgm.play();
+          image(virus, 700,120);
+        }else{
+          image(virus, 700,120);
+        }
+      }
+      if(score>1486 && score<1600){
+        background(0);
+      }
+      if(score>=1600){
         error_bgm.pause();
         error_bgm.rewind();
-        mode2_bgm.play();  
+        mode2_bgm.play();
       }
-    }
+      if(score>1600 && score<1735){
+        erogif0.play();
+        image(erogif0,width/2,height/2);
+      }else if(score >= 1735 && score < 1945){
+        erogif2.play();
+        image(erogif2,width/2,height/2);
+      }else if(score >= 1945 && score < 2113){
+        erogif5.play();
+        image(erogif5,width/2,height/2);
+      }else if(score >= 2113 && score < 2281){
+        erogif9.play();
+        image(erogif9,width/2,height/2);
+      }else if(score >= 2281){
+        if(score == 2281){
+          mode2_bgm.close();
+          rocky.play();
+        }
+      }
+      
+      
+      imageMode(CORNER);
+
+//score 1396~1486 : errorlog
+//score 1486~1600 : blackout
+
+    }//ero modo owari
+    
+    //共通パート
+    tint(255,255);
     line(0,height-29,width,height-29);//GameOver line
+    //Alpha = true;              //テスト用
     if(Alpha == true){
       Alpha = false;
       if(alt == 75){
@@ -385,67 +520,20 @@ void draw(){
       scene = 5;
       alt = 75;      
     }
+    
+    textAlign(LEFT);
+    fill(255,50);
+    noStroke();
+    rect(600,30,300,105);
+    fill(139,28,98);
+    stroke(139,28,98);
     text("SCORE", width*3/5, height/10);
     text(score/10 + "m", width*3/5, height/5);
     text("MODE" , width*4/5, height/10);
     text(modename, width*4/5, height/5);
     score++;
-    if(mode==2){// hikouki no ue ni hyouji
-      if(score>=700 && score<790){
-        if(score==700){
-          mode2_bgm.pause();
-          error_bgm.pause();
-          error_bgm.rewind();
-          error_bgm.play();
-          image(virus, 340,180);
-        }else{
-          image(virus, 340,180);
-        }
-      } 
-      if(score>=720 && score<790){
-        if(score==720){
-          error_bgm.pause();
-          error_bgm.rewind();
-          error_bgm.play();
-          image(virus, 0,0);
-        }else{
-          image(virus, 0,0);  
-        }
-      }
-      if(score>=740 && score<790){
-        if(score==740){
-          error_bgm.pause();
-          error_bgm.rewind();
-          error_bgm.play();
-          image(virus, 500,350);
-        }else{
-          image(virus, 500,350);  
-        }
-      }
-      if(score>=760 && score<790){
-        if(score==760){
-          error_bgm.pause();
-          error_bgm.rewind();
-          error_bgm.play();
-          image(virus, 100,400);
-        }else{
-          image(virus, 100,400);  
-        }
-      }
-      if(score>=780 && score<790){
-        if(score==780){
-          error_bgm.pause();
-          error_bgm.rewind();
-          error_bgm.play();
-          image(virus, 700,120);
-        }else{
-          image(virus, 700,120);  
-        }
-      }
-    if(score>790 && score<1000){
-      background(0);
-    }
-  }
+    
+    
   }else if(scene == 4){
     
     //----------Game Over----------
@@ -467,12 +555,15 @@ void draw(){
       mode1_bgm.rewind();
       mode2_bgm.pause();
       mode2_bgm.rewind();
+      rocky.pause();
+      rocky.rewind();
     }
   }else if(scene == 5){
     
     //----------Game Clear----------
     
     textSize(60);
+    textAlign(CENTER);
     text("Congratulations!", width/2, height/2);
     count--;
     if(count < 0){
@@ -485,7 +576,9 @@ void draw(){
       mode1_bgm.rewind();
       mode2_bgm.pause();
       mode2_bgm.rewind();
-    }  
+      rocky.pause();
+      rocky.rewind();
+    }
   }
 }
 
