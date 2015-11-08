@@ -20,12 +20,15 @@ float value_ave;
 float limit = 100;
 float limit_ratio = 0.8;
 
+String[][] r ={{"Cランク","Bランク","Aランク","Sランク"},{"ビビり","凡人","怖いもの知らず","人間じゃねぇ"},{"むっつり","プチ賢者","賢者","大賢者"}};
+
 final int PORT = 5000;
 OscP5 oscP5 = new OscP5(this, PORT);
 
 int scene;
 int mode = 0;
 int count = 0;
+int rcount = 0;
 int alt = 75;
 int x=600;
 int scrollCount=0;
@@ -35,12 +38,17 @@ float score = 0;
 boolean Nod;
 boolean Shake;
 boolean Alpha;
+boolean resultReady;
 String modename;
+
+//PFont MarioFont = loadFont("ArcadeClassic-48.vlw");
+PFont NormalFont = createFont("Cambria Math", 36, true);
+PFont MarioFont = createFont("ArcadeClassic", 36, true);
 
 PImage up,down,normal,sky,horror6,horror7,bgNormal, bgHorror, bgEro, virus, resultbg;
 Gif airplain,horror1,horror2,horror3,horror4,horror5,horror8,horror9,horror10,horror11,horror12,ero1;
 Minim minim;
-AudioPlayer title_bgm,decision,cursor,mode0_bgm,mode0_gameover_bgm, mode1_bgm,mode2_bgm, error_bgm, hereWeGo,nigasanai,tasukete,himei;
+AudioPlayer title_bgm,decision,cursor,mode0_bgm,mode0_gameover_bgm, mode0_gameclear_bgm, mode1_bgm,mode2_bgm, error_bgm, hereWeGo,nigasanai,tasukete,himei, meter, meter2, pon, don, snare, jan;
 
 void setup(){
   size(1000, 600);
@@ -53,6 +61,7 @@ void setup(){
   cursor = minim.loadFile("music/cursor.mp3");
   mode0_bgm = minim.loadFile("music/mario.mp3");
   mode0_gameover_bgm = minim.loadFile("music/marioDeath.mp3");
+  mode0_gameclear_bgm = minim.loadFile("music/marioClear.wav");
   mode1_bgm = minim.loadFile("music/radionoise.mp3");
   mode2_bgm = minim.loadFile("music/H na BGM.mp3");
   error_bgm = minim.loadFile("music/Windows20XP20Error.wav");
@@ -60,6 +69,12 @@ void setup(){
   nigasanai = minim.loadFile("music/nigasanai.mp3");
   tasukete = minim.loadFile("music/tasukete.mp3");
   himei = minim.loadFile("music/himei.mp3");
+  meter = minim.loadFile("music/meter.mp3");
+  meter2 = minim.loadFile("music/meter2.mp3");
+  pon = minim.loadFile("music/iyopon.mp3");
+  don = minim.loadFile("music/don.mp3");
+  snare = minim.loadFile("music/snareroll.mp3");
+  jan = minim.loadFile("music/jan.mp3");
   up = loadImage("img/airplain_up.png");
   down = loadImage("img/airplain_down.png");
   normal = loadImage("img/airplain_normal.png");
@@ -67,7 +82,7 @@ void setup(){
   bgNormal = loadImage("img/mario(840-600).jpg");
   bgEro = loadImage("img/black.JPG");
   virus = loadImage("img/virusWindow.jpg");
-  resultbg = loadImage("img/result2_template.png");
+  resultbg = loadImage("img/result_kai.png");
   horror6 = loadImage("img/horror6.jpg"); 
   horror7 = loadImage("img/horror7.jpg"); 
   airplain = new Gif(this, "img/title.gif");
@@ -86,6 +101,9 @@ void setup(){
 }
 
 void draw(){
+  
+  //debug
+  text(str(resultReady), 100,100);
   
   //---------- ACC ----------
   
@@ -158,9 +176,10 @@ void draw(){
       x--;
     }
     
+    textFont(NormalFont);
     textSize(60);
     textAlign(CENTER);
-    text("Paper Plane Game", width/2, height/2-50);
+    text("Alpha Paper Plane", width/2, height/2-50);
     textSize(40);
     text("Please Nod.", width/2, height/2+50);
     if(Nod == true){
@@ -386,10 +405,13 @@ void draw(){
       scene = 5;
       alt = 75;      
     }
+    textFont(MarioFont);
+    textSize(40);
+    textAlign(CENTER);
     text("SCORE", width*3/5, height/10);
-    text(score/10 + "m", width*3/5, height/5);
+    text(score/10 + "m", width*3/5, (height/10)+60);
     text("MODE" , width*4/5, height/10);
-    text(modename, width*4/5, height/5);
+    text(modename, width*4/5, (height/10)+60);
     score++;
     if(mode==2){// hikouki no ue ni hyouji
       if(score>=700 && score<790){
@@ -451,18 +473,29 @@ void draw(){
     
     //----------Game Over----------
 
-    if(mode==0 && count == 300){
-            mode0_bgm.pause();
-            mode0_bgm.rewind();
-            mode0_gameover_bgm.play();
+    if(count == 300){
+      if(mode==0){
+        mode0_bgm.pause();
+        mode0_bgm.rewind();
+        mode0_gameover_bgm.play();
+      }
+      if(mode==1){
+        mode1_bgm.pause();
+        mode1_bgm.rewind();
+      }if(mode==2){
+        mode2_bgm.pause();
+        mode2_bgm.rewind();
+      }
     }    
+    
     textSize(60);
     text("Game Over", width/2, height/2);
     count--;
-    if(count < 0){
+    if(count < 150){
       scene = 6;
-      count = 300;
+      count = 400;
       scrollCount = 0;
+      boolean resultReady = false;
       mode1_bgm.pause();
       mode1_bgm.rewind();
       mode2_bgm.pause();
@@ -471,111 +504,237 @@ void draw(){
   }else if(scene == 5){
     
     //----------Game Clear----------
-    
     textSize(60);
     text("Congratulations!", width/2, height/2);
+    if(count == 300){
+      if(mode==0){
+        mode0_bgm.pause();
+        mode0_bgm.rewind();
+        mode0_gameclear_bgm.play();
+      }
+      if(mode==1){
+        mode1_bgm.pause();
+        mode1_bgm.rewind();
+      }if(mode==2){
+        mode2_bgm.pause();
+        mode2_bgm.rewind();
+      }
+    }      
     count--;
-    if(count < 0){
+    if(count < 90){
       scene = 6;
-      count = 300;
-      mode0_bgm.pause();
-      mode0_bgm.rewind();
-      mode1_bgm.pause();
-      mode1_bgm.rewind();
-      mode2_bgm.pause();
-      mode2_bgm.rewind();
+      count = 400;
+      boolean resultReady = false;
+      mode0_gameclear_bgm.pause();
+      mode0_gameclear_bgm.rewind();
     }  
   }else if(scene == 6){
     
     //-----------Result------------
-    
+    textFont(MarioFont);
+    fill(0);
+    //textFont(NormalFont);
     count--;
     image(resultbg, 0,0, 1000,600);
-    if(count<290){
-      textSize(35);
-      textAlign(LEFT);
-      text("Player name", 330, 130);
-    }
-    if(count<280){
-      textSize(40);
-      textAlign(CENTER);
-      text("MODE",360, 205);
-      if(count<270){
-        text(modename, 360, 255);
-      }
-    }
-    if(count<260){
+    pon.play();
+    if(count<270){
+      don.play();
       textSize(50);
+      textAlign(CENTER);
+      text("MODE",365, 205);
+    }
+    if(count<250){
+      if(count==249){
+        don.pause();
+        don.rewind();
+        don.play();
+      } 
+      text(modename, 365, 255);
+    }
+    if(count<230){
+      if(count==229){
+        don.pause();
+        don.rewind();
+        don.play();
+      } 
+      textSize(60);
       textAlign(LEFT);
       text(score/10 + "m", 720, 155);
     }
     //score meter
     
     noStroke();
-    if(count<240){
+    
+    if(count<210){
+      meter.play();
       fill(255,0,0);
-      rect(520, 197, 41, 38);
+      rect(520, 195.5, 41, 39);
+      fill(0);
+      if(score<=350){
+        resultReady=true;
+      }
     }  
-    if(count<230 && score>350){
+    if(count<205 && score>350){
+      if(count==204){
+        meter.pause();
+        meter.rewind();
+        meter.play();
+      } 
       fill(255,25,0);
-      rect(562, 197, 41, 38);    
+      rect(561, 195.5, 41, 39);
+      fill(0);    
+      if(score<=700){
+        resultReady=true;
+      }
     }
-    if(count<220 && score>700){
+    if(count<200 && score>700){
+      if(count==199){
+        meter.pause();
+        meter.rewind();
+        meter.play();
+      } 
       fill(255,51,0);
-      rect(603, 197, 41, 38);    
+      rect(602, 195.5, 41, 39);
+      fill(0);
+      if(score<=1050){
+        resultReady=true;
+      }        
     }
-    if(count<210 && score>1050){
+    if(count<195 && score>1050){
+      if(count==194){
+        meter.pause();
+        meter.rewind();
+        meter.play();
+      } 
       fill(255,76,0);
-      rect(645, 197, 41, 38);    
+      rect(643, 195.5, 41, 39); 
+      fill(0); 
+      if(score<=1400){
+        resultReady=true;
+      }        
     }
-    if(count<200 && score>1400){
+    if(count<190 && score>1400){
+      if(count==189){
+        meter.pause();
+        meter.rewind();
+        meter.play();
+      } 
       fill(255,102,0);
-      rect(687, 197, 41, 38);    
+      rect(684, 195.5, 41, 39); 
+      fill(0); 
+      if(score<=1750){
+        resultReady=true;
+      }           
     }
-    if(count<190 && score>1750){
+    if(count<185 && score>1750){
+      if(count==184){
+        meter.pause();
+        meter.rewind();
+        meter.play();
+      } 
       fill(255,127,0);
-      rect(729, 197, 41, 38);    
+      rect(725, 195.5, 41, 39); 
+      fill(0);
+      if(score<=2100){
+        resultReady=true;
+      }   
     }
     if(count<180 && score>2100){
+      if(count==179){
+        meter.pause();
+        meter.rewind();
+        meter.play();
+      } 
       fill(255,153,0);
-      rect(771, 197, 41, 38);    
+      rect(766, 195.5, 41, 39); 
+      fill(0);
+      if(score<=2450){
+        resultReady=true;
+      }   
     }
-    if(count<170 && score>2450){
+    if(count<175 && score>2450){
+      if(count==174){
+        meter.pause();
+        meter.rewind();
+        meter.play();
+      } 
       fill(255,178,0);
-      rect(813, 197, 41, 38);    
+      rect(807, 195.5, 41, 39); 
+      fill(0);
+      if(score<=2800){
+        resultReady=true;
+      }   
     }
-    if(count<160 && score>2800){
+    if(count<170 && score>2800){
+      if(count==169){
+        meter.pause();
+        meter.rewind();
+        meter.play();
+      } 
       fill(255,204,0);
-      rect(855, 197, 41, 38);    
+      rect(848, 195.5, 41, 39); 
+      fill(0);
+      if(score<=3000){
+        resultReady=true;
+      }   
     }
-    if(count<150 && score>3000){
+    if(count<165 && score>3000){
+      if(count==164){
+        meter2.pause();
+        meter2.rewind();
+        meter2.play();
+      } 
       fill(255,255,0);
-      rect(897, 197, 41, 38);    
+      rect(889, 195.5, 50, 39); 
+      fill(0);
+      resultReady=true;
     }
-    if(count < 120){
-      textSize(70);
-      text("You are", 250, 450);
-      if(score<1000){
-        text("LittleKenja", 600, 450);
+    if(resultReady==true){
+      rcount++;
+      if(rcount>=30){
+        if(rcount==30){
+          snare.play();
+        }
+        textSize(70);
+        text("あなたは", 200, 450);
       }
-      if(score<2000){
-        text("MiddleKenja", 600, 450);
-      }
-      if(score<3000){
-        text("BigKenja", 600, 450);
-      }
-      if(score>=3000){
-        text("KingKenja", 600, 450);
+      if(rcount >=60){
+        if(rcount==60){
+          snare.pause();
+          snare.rewind();
+          jan.play();
+        }
+        if(score<1000){
+          text(r[mode][0], 550, 450);
+        }
+        if(1000<=score && score<2000){
+          text(r[mode][1], 550, 450);
+        }
+        if(2000<=score && score<3000){
+          text(r[mode][2], 550, 450);
+        }
+        if(3000<=score){
+          text(r[mode][3], 550, 450);
+        }
       }
     }
-    
-    if(count < 0){
+    if(rcount > 150){
       scene = 0;
       score = 0;
       count = 150;
+      rcount = 0;
+      pon.pause();
+      pon.rewind();
+      meter.pause();
+      meter.rewind();
+      meter2.pause();
+      meter2.rewind();
+      jan.pause();
+      jan.rewind();
     }
   }
 }
+
 
 void keyPressed() {
   if(keyCode == DOWN){
