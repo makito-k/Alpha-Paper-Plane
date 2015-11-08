@@ -28,8 +28,8 @@ int mode = 0;
 int count = 0;
 int alt = 75;
 int x=600;
-int scrollCount=0;
-int scrollCount2=0;
+int scrollCount = 0;
+int scrollCount2 = 0;
 float random;
 float score = 0.0;
 boolean Nod;
@@ -38,8 +38,9 @@ boolean Alpha;
 String modename;
 
 PImage up,down,normal,sky,horror6,horror7,bgNormal, bgHorror, bgEro, virus;
-PImage[] eroimg = new PImage[100];
-Gif airplain,horror1,horror2,horror3,horror4,horror5,horror8,horror9,horror10,horror11,horror12,erogif0,erogif1,erogif2,erogif3,erogif4,erogif5,erogif6,erogif7,erogif8,erogif9;
+PImage seishi_top,seishi_middle,seishi_bottom,seishi_dead,ranshi;
+PImage[] eroimg = new PImage[50];
+Gif airplain,horror1,horror2,horror3,horror4,horror5,horror8,horror9,horror10,horror11,horror12,erogif0,erogif1,erogif2,erogif3,erogif4,erogif5;
 Minim minim;
 AudioPlayer title_bgm,decision,cursor,mode0_bgm,mode0_gameover_bgm, mode1_bgm,mode2_bgm, error_bgm, hereWeGo,nigasanai,tasukete,himei,rocky;
 
@@ -48,6 +49,13 @@ int eroimgID = 0;
 int eroimgMaxID = 7;
 int fadeAlpha = 768;
 int fadeAlphaDefault = fadeAlpha;
+
+//エロモード終盤に使う変数
+int erogif5Alpha = 256;
+int rx = 1250;
+float dh = 2.0;
+float dw = 2.0*389/450;
+float h, w;
 
 void setup(){
   size(1000, 600);
@@ -91,22 +99,25 @@ void setup(){
   horror12 = new Gif(this,"img/horror12.gif");
   
   int i = 0;
-  while(i<=21){
+  while(i<=7){
     String imgName = "img/ero"+str(i+1)+".jpg";
     eroimg[i] = loadImage(imgName);
     i++;
   }
+  
+  seishi_top = loadImage("img/seishi_top.png");
+  seishi_middle = loadImage("img/seishi_middle.png");
+  seishi_bottom = loadImage("img/seishi_bottom.png");
+  seishi_dead = loadImage("img/seishi_dead.png");
+  ranshi = loadImage("img/ranshi.png");
+  h = float(ranshi.height);
+  w = float(ranshi.width);
   erogif0 = new Gif(this,"img/erogif0.gif");
   erogif1 = new Gif(this,"img/erogif1.gif");
   erogif2 = new Gif(this,"img/erogif2.gif");
   erogif3 = new Gif(this,"img/erogif3.gif");
   erogif4 = new Gif(this,"img/erogif4.gif");
   erogif5 = new Gif(this,"img/erogif5.gif");
-  erogif6 = new Gif(this,"img/erogif6.gif");
-  erogif7 = new Gif(this,"img/erogif7.gif");
-  erogif8 = new Gif(this,"img/erogif8.gif");
-  erogif9 = new Gif(this,"img/erogif9.gif");
-  
 }
 
 void draw(){
@@ -383,10 +394,10 @@ void draw(){
       scrollCount--;
       if(score==0){
         mode2_bgm.play();
+        //score = 1800;      //スキップ用
       }
       imageMode(CENTER);
-      if(score >= 120 && score <= 1296){
-        //imageMode(CENTER);
+      if(score >= 120 && score < 1296){
         if(eroimgID < eroimgMaxID){
           if(fadeAlpha > 256){
             fadeAlpha -= 5;
@@ -404,11 +415,8 @@ void draw(){
             eroimgID++;
           }
         }
-        //imageMode(CORNER);
-      }else if(score > 1295 && score <= 1396){
-        //imageMode(CENTER);
+      }else if(score >= 1296 && score <= 1396){
         image(eroimg[eroimgID],width/2,height/2);
-        //imageMode(CORNER);
       }
       if(score>=1396 && score<1486){
         if(score==1396){
@@ -442,7 +450,7 @@ void draw(){
         }
       }
       if(score>=1456 && score<1486){
-        if(score==1866){
+        if(score==1456){
           error_bgm.pause();
           error_bgm.rewind();
           error_bgm.play();
@@ -464,7 +472,7 @@ void draw(){
       if(score>1486 && score<1600){
         background(0);
       }
-      if(score>=1600){
+      if(score==1600){
         error_bgm.pause();
         error_bgm.rewind();
         mode2_bgm.play();
@@ -472,19 +480,54 @@ void draw(){
       if(score>1600 && score<1735){
         erogif0.play();
         image(erogif0,width/2,height/2);
-      }else if(score >= 1735 && score < 1945){
+      }else if(score >= 1735 && score < 1864){
+        erogif1.play();
+        image(erogif1,width/2,height/2);
+      }else if(score >= 1864 && score < 1948){
         erogif2.play();
         image(erogif2,width/2,height/2);
-      }else if(score >= 1945 && score < 2113){
+      }else if(score >= 1948 && score < 2032){
+        erogif3.play();
+        image(erogif3,width/2,height/2);
+      }else if(score >= 2032 && score < 2112){
+        erogif4.play();
+        image(erogif4,width/2,height/2);
+      }else if(score >= 2112 && score < 2169){
         erogif5.play();
         image(erogif5,width/2,height/2);
-      }else if(score >= 2113 && score < 2281){
-        erogif9.play();
-        image(erogif9,width/2,height/2);
-      }else if(score >= 2281){
-        if(score == 2281){
-          mode2_bgm.close();
+      }else if(score >= 2169 && score < 2200){
+        if(score == 2169){
+          mode2_bgm.pause();
+          mode2_bgm.rewind();
           rocky.play();
+        }
+        tint(255,erogif5Alpha);
+        image(erogif5,width/2,height/2);
+        erogif5Alpha -= 9;
+      }else if(score >= 2200){
+        if(h == 450.0){
+          erogif5Alpha = 256;  //初期化
+          dh = 8.0;
+          dw = dh*389/450;
+        }else if(h == 498.0){
+        dh = -2;
+        dw = dh*389/450;
+        }
+        if(rx > width/2){
+          tint(255,255);
+          image(ranshi,rx,height/2);
+          tint(255,60);
+          image(ranshi,rx,height/2,w+dw,h+dh);
+          rx -= 1;
+          h = h + dh;
+          w = w + dw;
+        }else{
+          tint(255,255);
+          image(ranshi,rx,height/2);
+          tint(255,60);
+          image(ranshi,rx,height/2,w+dw,h+dh);
+          h = h + dh;
+          w = w + dw;
         }
       }
       
@@ -496,10 +539,11 @@ void draw(){
 
     }//ero modo owari
     
+    
     //共通パート
     tint(255,255);
     line(0,height-29,width,height-29);//GameOver line
-    //Alpha = true;              //テスト用
+    Alpha = true;              //テスト用
     if(Alpha == true){
       Alpha = false;
       if(alt == 75){
@@ -542,7 +586,8 @@ void draw(){
             mode0_bgm.pause();
             mode0_bgm.rewind();
             mode0_gameover_bgm.play();
-    }    
+    }
+    textAlign(CENTER);
     textSize(60);
     text("Game Over", width/2, height/2);
     count--;
@@ -630,4 +675,23 @@ void oscEvent(OscMessage msg){
     value[pointer] = sum/n_validCh;
     pointer = (pointer + 1)%BUFFER_SIZE;
   }  
+}
+
+//stopボタンを押したときに1度だけ実行される
+void stop(){
+  title_bgm.close();
+  decision.close();
+  cursor.close();
+  mode0_bgm.close();
+  mode0_gameover_bgm.close();
+  mode1_bgm.close();
+  mode2_bgm.close();
+  error_bgm.close();
+  hereWeGo.close();
+  nigasanai.close();
+  tasukete.close();
+  himei.close();
+  rocky.close();
+  minim.stop();
+  super.stop();
 }
