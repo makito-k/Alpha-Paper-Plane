@@ -666,6 +666,7 @@ void draw(){
     text(score/10 + "m", width*3/5, height/5);
     text("MODE" , width*4/5, height/10);
     text(modename[mode], width*4/5, height/5);
+    text(difficultyname[difficulty],width*9/10, height);
     
     //---------- make object ----------
     
@@ -688,10 +689,10 @@ void draw(){
             if(mode == 0){
               image(object0, obx[i],obalt[i]-25,100,100);
             }else if(mode == 1){
-              if(150<obx[i] && obx[i]<350){
+              if(100<obx[i] && obx[i]<350){
                 image(object1,obx[i],obalt[i]-25,100,100);
               }else{        
-                image(object1r,obx[i],obalt[i]-25,100,100);
+                image(object1r,obx[i],obalt[i],50,50);
               }
             }else if(mode == 2){
               image(object2, obx[i],obalt[i]-25,100,100);
