@@ -63,7 +63,7 @@ PFont NormalFont = createFont("Monospaced", 36, true);
 PFont MarioFont = createFont("ArcadeClassic", 36, true);
 boolean resultReady;
 
-PImage up,down,normal,sky,horror6,horror7,seishi_top,seishi_middle,seishi_bottom,seishi_dead,ranshi,bgNormal, bgHorror, bgEro, virus, object0 ,object1,object1r,object2,resultbg;
+PImage up,down,normal,sky,horror6,horror7,seishi_top,seishi_middle,seishi_bottom,seishi_dead,ranshi,bgNormal, bgHorror, bgEro, virus, object0 ,object1,object1r,object2,resultbg, resultero;
 PImage[] eroimg = new PImage[50];
 Gif airplain,horror1,horror2,horror3,horror4,horror5,horror8,horror9,horror10,horror11,horror12,erogif0,erogif1,erogif2,erogif3,erogif4,erogif5;
 Minim minim;
@@ -116,6 +116,7 @@ void setup(){
   bgEro = loadImage("img/black.JPG");
   virus = loadImage("img/virusWindow.jpg");
   resultbg = loadImage("img/result_kai.png");
+  resultero = loadImage("img/result_ero.png");
   horror6 = loadImage("img/horror6.jpg"); 
   horror7 = loadImage("img/horror7.jpg"); 
   object0 = loadImage("img/object0.png");
@@ -812,7 +813,12 @@ void draw(){
     textFont(MarioFont);
     fill(0);
     count--;
-    image(resultbg, 0,0, 1000,600);
+    if(mode==0 || mode==1){
+      image(resultbg, 0,0, 1000,600);
+    }
+    if(mode==2){
+      image(resultero, 0,0, 1000,600);
+    }
     pon.play();
     if(count<270){
       don.play();
