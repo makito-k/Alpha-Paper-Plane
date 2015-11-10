@@ -666,7 +666,6 @@ void draw(){
     text(score/10 + "m", width*3/5, height/5);
     text("MODE" , width*4/5, height/10);
     text(modename[mode], width*4/5, height/5);
-    text(difficultyname[difficulty],width*9/10, height);
     
     //---------- make object ----------
     
