@@ -22,6 +22,7 @@ int n_validCh;
 int save = 0;
 float value_ave;
 float[] value_save = new float[100];
+int n_isNaN;
 float limit = 100;
 float limit_ratio = 1;
 
@@ -216,10 +217,15 @@ void draw(){
    }
    if(scene==2 && count == 0){
      float value_ave_long = 0;
+     n_isNaN = 0;
      for(int i = 0; i<100; i++){
-       value_ave_long += value_save[(save+90+i)%100]/100;
+       if(Float.isNaN(value_save[(save+i)%100])){
+         n_isNaN++;
+       }else{
+         value_ave_long += value_save[(save+i)%100];
+       }
      }
-     limit = value_ave_long * limit_ratio;   
+     limit = value_ave_long/(100-n_isNaN) * limit_ratio;   
    }
    if(value_ave > limit){
      Alpha = true;
@@ -353,10 +359,12 @@ void draw(){
         decision.play();
         scene = 2;
         if(difficulty == 0){
+          limit_ratio = 0.8;
           alt_downspeed = 2;
           alt_upspeed = 2;
           object_switch = false;
         }else if(difficulty == 1){
+          limit_ratio = 1;
           alt_downspeed = 2;
           alt_upspeed = 2;
           object_switch = true;
@@ -364,6 +372,7 @@ void draw(){
           maxn_object = 1; //1~3
           object_speed = 3;
         }else if(difficulty == 2){
+          limit_ratio = 1;
           alt_downspeed = 3;
           alt_upspeed = 3;
           object_switch = true;
@@ -371,6 +380,7 @@ void draw(){
           maxn_object = 2; //1~3
           object_speed = 4;
         }else if(difficulty == 3){
+          limit_ratio = 1;
           alt_downspeed = 4;
           alt_upspeed = 4;
           object_switch = true;
@@ -770,7 +780,11 @@ void draw(){
     //----------Game Over----------
 
     textSize(60);
-    text("Game Over", width/2, height/2);
+    if(mode == 0 || mode == 1){
+      text("Game Over", width/2, height/2);
+    }else if(mode == 2){
+      text("受精失敗！",width/2, height/2);
+    }
     if(count == 300){
       if(mode==0){
         mode0_bgm.pause();
@@ -817,7 +831,11 @@ void draw(){
     //----------Game Clear----------
     
     textSize(60);
-    text("Congratulations!", width/2, height/2);
+    if(mode == 0 || mode == 1){
+      text("Congratulations!", width/2, height/2);
+    }else if(mode == 2){
+      text("受精成功！！",width/2, height/2);
+    }
     if(count == 300){
       if(mode==0){
         mode0_bgm.pause();
@@ -1066,6 +1084,8 @@ void draw(){
       jan.pause();
       jan.rewind();
       n_object = 0;
+      eroimgID = 0;
+      fadeAlpha = fadeAlphaDefault;
     } 
   }
 }
